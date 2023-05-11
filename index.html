@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <title>Arxiv Reader</title>
+    </head>
+    <body>
+        <div id="input">
+            <textarea onchange="parse(event)"></textarea>
+        </div>
+        <div id="preview">
+            <div id="prev" onclick="prev()"><p><</p></div>
+            <div id="content">
+                <div><a id="title" href=""></a></div>
+                <div id="authors"></div>
+                <div id="abstract"></div>
+            </div>
+            <div id="next" onclick="next()"><p>></p></div>
+        </div>
+        <div id="index"></div>
+
+        <style>
+            body {
+                margin: 24px 25%;
+                width: 50%;
+                box-sizing: border-box;
+                font-family: sans-serif;
+            }
+            textarea {
+                width: 100%;
+            }
+            #preview {
+                display: flex;
+                justify-content: space-evenly;
+                align-items: stretch;
+            }
+            #content {
+                padding: 24px;
+                width: 85%;
+            }
+            #title {
+                font-size: 2em;
+            }
+            #prev, #next {
+                cursor: pointer;
+                padding: 24px;
+                display: flex;
+                align-items: center;
+            }
+            #prev:hover, #next:hover {
+                cursor: pointer;
+                background: lightgray;
+            }
+            #index {
+                text-align: center;
+                padding: 24px;
+            }
+        </style>
+
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>
+            class Entry {
+                constructor(title, authors, abstract, link) {
+                    this.title = title;
+                    this.authors = authors;
+                    this.abstract = abstract;
+                    this.link = link;
+                }
+            }
+
+            let entries = [];
+            let curr_entry_id = 0;
+
+            const re = /Title: ([^\n]*)\nAuthors: ([^\n]*)\n[^\\]*\\\\([^\\]*)\\\\ \( ([^\s]+)/gm;
+
+            document.addEventListener('keyup', (e) => {
+                if (e.code === "ArrowRight")        next();
+                else if (e.code === "ArrowLeft")    prev();
+            });
+
+            function parse(e) {
+                const mail = e.target.value;
+
+                entries = [];
+
+                const matches = [...mail.matchAll(re)];
+
+                matches.forEach(m => entries.push(new Entry(m[1], m[2], m[3], m[4])));
+
+                curr_entry_id = 0;
+                update_entry();
+            }
+
+            function update_entry() {
+                document.querySelector('#title').innerText = entries[curr_entry_id].title;
+                document.querySelector('#title').setAttribute('href', entries[curr_entry_id].link);
+                document.querySelector('#authors').innerText = entries[curr_entry_id].authors;
+                document.querySelector('#abstract').innerText = entries[curr_entry_id].abstract;
+                document.querySelector('#index').innerText = curr_entry_id + 1 + " / " + entries.length;
+                MathJax.typeset();
+            }
+
+            function prev() {
+                curr_entry_id = Math.max(0, curr_entry_id - 1);
+                update_entry();
+            }
+            function next() {
+                curr_entry_id = Math.min(entries.length - 1, curr_entry_id + 1);
+                update_entry();
+            }
+        </script>
+    </body>
+</html>
