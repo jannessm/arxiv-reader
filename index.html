@@ -122,12 +122,10 @@
 
             function update_entry() {
                 if (filtered_entries.length == 0) {
-                    document.querySelector('#title').innerText = '';
-                    document.querySelector('a').setAttribute('href', '');
-                    document.querySelector('#authors').innerText = '';
-                    document.querySelector('#abstract').innerText = '';
+                    document.querySelector('#preview').style.display = 'none';
                     document.querySelector('#index').innerText = 0 + " / " + 0;   
                 } else {
+                    document.querySelector('#preview').style.display = '';
                     document.querySelector('#title').innerText = filtered_entries[curr_entry_id].title;
                     document.querySelector('a').setAttribute('href', filtered_entries[curr_entry_id].link);
                     document.querySelector('#authors').innerText = filtered_entries[curr_entry_id].authors;
