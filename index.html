@@ -4,7 +4,8 @@
     </head>
     <body>
         <div id="input">
-            <textarea onchange="parse(event)"></textarea>
+            <textarea onchange="parse(event)" placeholder="Paste your mail content here."></textarea>
+            <input id="filter" onchange="filter()">
         </div>
         <div id="preview">
             <div id="prev" onclick="prev()"><p><</p></div>
@@ -25,6 +26,10 @@
                 font-family: sans-serif;
             }
             textarea {
+                width: 100%;
+                margin: 24px 0;
+            }
+            input {
                 width: 100%;
             }
             #preview {
@@ -65,9 +70,16 @@
                     this.abstract = abstract;
                     this.link = link;
                 }
+
+                matches(search_str) {
+                    search_str = search_str.toLowerCase();
+                    console.log(search_str, this.title.toLowerCase(), this.title.toLowerCase().includes(search_str));
+                    return [this.title, this.authors, this.abstract, this.link].reduce((matches, val) => matches || val.toLowerCase().includes(search_str), false);
+                }
             }
 
             let entries = [];
+            let filtered_entries = [];
             let curr_entry_id = 0;
 
             const re = /Title: ([^\n]*)\nAuthors: ([^\n]*)\n[^\\]*\\\\([^\\]*)\\\\ \( ([^\s]+)/gm;
@@ -87,15 +99,24 @@
                 matches.forEach(m => entries.push(new Entry(m[1], m[2], m[3], m[4])));
 
                 curr_entry_id = 0;
+                filter();
                 update_entry();
             }
 
             function update_entry() {
-                document.querySelector('#title').innerText = entries[curr_entry_id].title;
-                document.querySelector('#title').setAttribute('href', entries[curr_entry_id].link);
-                document.querySelector('#authors').innerText = entries[curr_entry_id].authors;
-                document.querySelector('#abstract').innerText = entries[curr_entry_id].abstract;
-                document.querySelector('#index').innerText = curr_entry_id + 1 + " / " + entries.length;
+                if (filtered_entries.length == 0) {
+                    document.querySelector('#title').innerText = '';
+                    document.querySelector('#title').setAttribute('href', '');
+                    document.querySelector('#authors').innerText = '';
+                    document.querySelector('#abstract').innerText = '';
+                    document.querySelector('#index').innerText = 0 + " / " + 0;   
+                } else {
+                    document.querySelector('#title').innerText = filtered_entries[curr_entry_id].title;
+                    document.querySelector('#title').setAttribute('href', filtered_entries[curr_entry_id].link);
+                    document.querySelector('#authors').innerText = filtered_entries[curr_entry_id].authors;
+                    document.querySelector('#abstract').innerText = filtered_entries[curr_entry_id].abstract;
+                    document.querySelector('#index').innerText = curr_entry_id + 1 + " / " + filtered_entries.length;
+                }
                 MathJax.typeset();
             }
 
@@ -104,7 +125,13 @@
                 update_entry();
             }
             function next() {
-                curr_entry_id = Math.min(entries.length - 1, curr_entry_id + 1);
+                curr_entry_id = Math.min(filtered_entries.length - 1, curr_entry_id + 1);
+                update_entry();
+            }
+            
+            function filter() {
+                const filter = document.querySelector('#filter').value.split(',').map(v => v.trim());
+                filtered_entries = entries.filter(val => filter.reduce((matches, search_str) => matches || val.matches(search_str), false));
                 update_entry();
             }
         </script>
