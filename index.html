@@ -4,16 +4,22 @@
     </head>
     <body>
         <div id="input">
-            <textarea onchange="parse(event)" placeholder="Paste your mail content here."></textarea>
-            <input id="filter" onchange="filter()">
+            <input id="filter" oninput="filter()" placeholder="Filter">
+            <textarea oninput="parse(event.target.value)" placeholder="Subscription Content"></textarea>
+            <div id="buttons">
+                <button onclick="clearInput()">Clear Input</button>
+                <button onclick="paste()">Paste Subscription Content</button>
+            </div>
         </div>
         <div id="preview">
             <div id="prev" onclick="prev()"><p><</p></div>
-            <div id="content">
-                <div><a id="title" href=""></a></div>
-                <div id="authors"></div>
-                <div id="abstract"></div>
-            </div>
+            <a href="">
+                <div id="content">
+                    <div id="title"></div>
+                    <div id="authors"></div>
+                    <div id="abstract"></div>
+                </div>
+            </a>
             <div id="next" onclick="next()"><p>></p></div>
         </div>
         <div id="index"></div>
@@ -25,13 +31,28 @@
                 box-sizing: border-box;
                 font-family: sans-serif;
             }
-            textarea {
+            button {
                 width: 100%;
-                margin: 24px 0;
+                margin: 12px 0;
+                padding: 12px;
+                border: none;
             }
-            input {
+            input, textarea {
                 width: 100%;
+                border: lightgrey 1px solid;
+                padding: 12px;
             }
+            #buttons {
+                display: flex;
+                gap: 8px;
+            }
+
+            a {
+                text-decoration: none;
+                color: darkslategrey;
+                background: buttonface;
+            }
+
             #preview {
                 display: flex;
                 justify-content: space-evenly;
@@ -60,8 +81,6 @@
             }
         </style>
 
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script>
             class Entry {
                 constructor(title, authors, abstract, link) {
@@ -73,30 +92,28 @@
 
                 matches(search_str) {
                     search_str = search_str.toLowerCase();
-                    console.log(search_str, this.title.toLowerCase(), this.title.toLowerCase().includes(search_str));
                     return [this.title, this.authors, this.abstract, this.link].reduce((matches, val) => matches || val.toLowerCase().includes(search_str), false);
                 }
             }
 
-            let entries = [];
-            let filtered_entries = [];
-            let curr_entry_id = 0;
-
-            const re = /Title: ([^\n]*)\nAuthors: ([^\n]*)\n[^\\]*\\\\([^\\]*)\\\\ \( ([^\s]+)/gm;
+            function restoreObjects(name) {
+                return JSON.parse(window.localStorage.getItem(name) || "[]")
+                           .map(val => new Entry(val.title, val.authors, val.abstract, val.link));
+            }
 
             document.addEventListener('keyup', (e) => {
-                if (e.code === "ArrowRight")        next();
-                else if (e.code === "ArrowLeft")    prev();
+                const filter_has_focus = document.activeElement !== document.querySelector('#filter');
+                if (e.code === "ArrowRight" && filter_has_focus)        next();
+                else if (e.code === "ArrowLeft" && filter_has_focus)    prev();
             });
 
-            function parse(e) {
-                const mail = e.target.value;
-
+            function parse(mail) {
                 entries = [];
 
                 const matches = [...mail.matchAll(re)];
 
                 matches.forEach(m => entries.push(new Entry(m[1], m[2], m[3], m[4])));
+                window.localStorage.setItem('entries', JSON.stringify(entries));
 
                 curr_entry_id = 0;
                 filter();
@@ -106,18 +123,18 @@
             function update_entry() {
                 if (filtered_entries.length == 0) {
                     document.querySelector('#title').innerText = '';
-                    document.querySelector('#title').setAttribute('href', '');
+                    document.querySelector('a').setAttribute('href', '');
                     document.querySelector('#authors').innerText = '';
                     document.querySelector('#abstract').innerText = '';
                     document.querySelector('#index').innerText = 0 + " / " + 0;   
                 } else {
                     document.querySelector('#title').innerText = filtered_entries[curr_entry_id].title;
-                    document.querySelector('#title').setAttribute('href', filtered_entries[curr_entry_id].link);
+                    document.querySelector('a').setAttribute('href', filtered_entries[curr_entry_id].link);
                     document.querySelector('#authors').innerText = filtered_entries[curr_entry_id].authors;
                     document.querySelector('#abstract').innerText = filtered_entries[curr_entry_id].abstract;
                     document.querySelector('#index').innerText = curr_entry_id + 1 + " / " + filtered_entries.length;
                 }
-                MathJax.typeset();
+                window.localStorage.setItem('entry_id', curr_entry_id);
             }
 
             function prev() {
@@ -130,10 +147,50 @@
             }
             
             function filter() {
-                const filter = document.querySelector('#filter').value.split(',').map(v => v.trim());
-                filtered_entries = entries.filter(val => filter.reduce((matches, search_str) => matches || val.matches(search_str), false));
+                if (input_delay) {
+                    clearTimeout(input_delay);
+                }
+                input_delay = setTimeout(() => {
+                    const filter = document.querySelector('#filter').value.split(',').map(v => v.trim());
+                    filtered_entries = entries.filter(val => filter.reduce((matches, search_str) => matches || val.matches(search_str), false));
+                    
+                    window.localStorage.setItem('filter', document.querySelector('#filter').value);
+                    window.localStorage.setItem('filtered_entries', JSON.stringify(filtered_entries));
+                    
+                    update_entry();
+                }, 500);
+            }
+
+            function paste() {
+                if (navigator.userAgent.includes("Firefox")){
+                    alert('Paste is not working in Firefox. Please paste your text in the textarea above.');
+                    return;
+                }
+                navigator.clipboard.readText().then((clipText) => parse(clipText));
+            }
+
+            function clearInput() {
+                document.querySelector('textarea').value = '';
+                entries = [];
+                filtered_entries = [];
+                curr_entry_id = 0;
+                window.localStorage.setItem('entries', JSON.stringify(entries));
+                window.localStorage.setItem('filtered_entries', JSON.stringify(filtered_entries));
+                window.localStorage.setItem('entry_id', 0);
                 update_entry();
             }
+
+
+            // init
+            let entries = restoreObjects('entries');
+            let filtered_entries = restoreObjects('filtered_entries');
+            let curr_entry_id = parseInt(window.localStorage.getItem('entry_id')) || 0;
+            let input_delay;
+
+            const re = /Title: ([^\n]*)\nAuthors: ([^\n]*)\n[^\\]*\\\\([^\\]*)\\\\ \( ([^\s]+)/gm;
+
+            document.querySelector('#filter').value = window.localStorage.getItem('filter') || '';
+            update_entry();
         </script>
     </body>
 </html>
