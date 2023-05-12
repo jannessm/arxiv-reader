@@ -14,7 +14,7 @@
         </div>
         <div id="preview">
             <div id="prev" onclick="prev()"><p><</p></div>
-            <a href="">
+            <a href="" target="_blank">
                 <div id="content">
                     <div id="title"></div>
                     <div id="authors"></div>
@@ -24,6 +24,13 @@
             <div id="next" onclick="next()"><p>></p></div>
         </div>
         <div id="index"></div>
+        <div id="help">
+            <h4>Usage</h4>
+            <ol>
+                <li>Paste your arxiv mail into the text area by clicking the paste button or manually (Ctrl+V).</li>
+                <li>Navigate through the new articles by the arrow keys or with the indicated buttons</li>
+            </ol>
+        </div>
 
         <style>
             body {
@@ -31,6 +38,9 @@
                 width: 50%;
                 box-sizing: border-box;
                 font-family: sans-serif;
+            }
+            #help {
+                color: #444;
             }
             button {
                 width: 100%;
