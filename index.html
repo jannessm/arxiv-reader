@@ -165,7 +165,10 @@
                     alert('Paste is not working in Firefox. Please paste your text in the textarea above.');
                     return;
                 }
-                navigator.clipboard.readText().then((clipText) => parse(clipText));
+                navigator.clipboard.readText().then((clipText) => {
+                    parse(clipText);
+                    docuemnt.querySelector('textarea').value = clipText;
+                });
             }
 
             function clearInput() {
