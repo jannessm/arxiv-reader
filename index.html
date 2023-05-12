@@ -130,8 +130,8 @@
                 const filter_has_focus = document.activeElement === document.querySelector('#filter');
                 if (e.code === "ArrowRight" && !filter_has_focus)        next();
                 else if (e.code === "ArrowLeft" && !filter_has_focus)    prev();
-                else if (e.code === "o" && !filter_has_focus) {
-                    window.open(filtered_entries[curr_entry_id].link, '_blank');
+                else if (e.code === "KeyO" && !filter_has_focus) {
+                    document.querySelector('#paper_link').click();
                 }
             });
 
