@@ -6,7 +6,7 @@
     </head>
     <body>
         <h1><span style="color: darkorange">Arxiv</span> <span style="color: royalblue">Reader</span></h1>
-        <a href="https://github.com/jannessm/arxiv-reader">GitHub</a>
+        <div id="git"><a style="padding: 12px" target="_blank" href="https://github.com/jannessm/arxiv-reader">GitHub</a>
         <div id="input">
             <input id="filter" oninput="filter()" placeholder="Filter">
             <textarea oninput="parse(event.target.value)" placeholder="Subscription Content"></textarea>
@@ -44,6 +44,12 @@
             }
             h1 {
                 text-align: center;
+            }
+            #git {
+                width: 100%;
+                text-align: center;
+                margin: 12px 0;
+                height: 32px;
             }
             #help {
                 color: #aaa;
