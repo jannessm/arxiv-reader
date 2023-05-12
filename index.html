@@ -6,7 +6,7 @@
     </head>
     <body>
         <h1><span style="color: darkorange">Arxiv</span> <span style="color: royalblue">Reader</span></h1>
-        <div id="git"><a style="padding: 12px" target="_blank" href="https://github.com/jannessm/arxiv-reader">GitHub</a>
+        <div id="git"><a style="padding: 12px" target="_blank" href="https://github.com/jannessm/arxiv-reader">GitHub</a></div>
         <div id="input">
             <input id="filter" oninput="filter()" placeholder="Filter">
             <textarea oninput="parse(event.target.value)" placeholder="Subscription Content"></textarea>
@@ -31,7 +31,8 @@
             <h4>Usage</h4>
             <ol>
                 <li>Paste your arxiv mail into the text area by clicking the paste button or manually (Ctrl+V).</li>
-                <li>Navigate through the new articles by the arrow keys or with the indicated buttons</li>
+                <li>Navigate through the new articles by the <b>arrow keys</b> or with the indicated buttons</li>
+                <li>Open a paper by pressing <b>o</b> or by clicking on it.</li>
             </ol>
         </div>
 
@@ -126,9 +127,12 @@
             }
 
             document.addEventListener('keyup', (e) => {
-                const filter_has_focus = document.activeElement !== document.querySelector('#filter');
-                if (e.code === "ArrowRight" && filter_has_focus)        next();
-                else if (e.code === "ArrowLeft" && filter_has_focus)    prev();
+                const filter_has_focus = document.activeElement === document.querySelector('#filter');
+                if (e.code === "ArrowRight" && !filter_has_focus)        next();
+                else if (e.code === "ArrowLeft" && !filter_has_focus)    prev();
+                else if (e.code === "o" && !filter_has_focus) {
+                    window.open(filtered_entries[curr_entry_id].link, '_blank');
+                }
             });
 
             function parse(mail) {
