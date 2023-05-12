@@ -17,7 +17,7 @@
         </div>
         <div id="preview">
             <div id="prev" onclick="prev()"><p><</p></div>
-            <a href="" target="_blank">
+            <a href="" target="_blank" id="paper_link">
                 <div id="content">
                     <div id="title"></div>
                     <div id="authors"></div>
@@ -37,8 +37,8 @@
 
         <style>
             body {
-                margin: 24px 25%;
-                width: 50%;
+                margin: 12px auto;
+                width: max(320px, min(800px, calc(100% - 24px)));
                 box-sizing: border-box;
                 font-family: sans-serif;
             }
@@ -151,7 +151,7 @@
                 } else {
                     document.querySelector('#preview').style.display = '';
                     document.querySelector('#title').innerText = filtered_entries[curr_entry_id].title;
-                    document.querySelector('a').setAttribute('href', filtered_entries[curr_entry_id].link);
+                    document.querySelector('#paper_link').setAttribute('href', filtered_entries[curr_entry_id].link);
                     document.querySelector('#authors').innerText = filtered_entries[curr_entry_id].authors;
                     document.querySelector('#abstract').innerText = filtered_entries[curr_entry_id].abstract;
                     document.querySelector('#index').innerText = curr_entry_id + 1 + " / " + filtered_entries.length;
