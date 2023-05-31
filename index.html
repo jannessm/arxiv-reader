@@ -3,6 +3,9 @@
         <title>Arxiv Reader</title>
         <link rel="icon" type="image/png" href="icon.png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <script type="text/javascript" id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
     </head>
     <body>
         <h1><span style="color: darkorange">Arxiv</span> <span style="color: royalblue">Reader</span></h1>
@@ -163,6 +166,7 @@
                     document.querySelector('#index').innerText = curr_entry_id + 1 + " / " + filtered_entries.length;
                 }
                 window.localStorage.setItem('entry_id', curr_entry_id);
+                MathJax.typeset();
             }
 
             function prev() {
