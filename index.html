@@ -34,6 +34,7 @@
                 <li>Navigate through the new articles by the <b>arrow keys</b> or with the indicated buttons</li>
                 <li>Open a paper by pressing <b>o</b> or by clicking on it.</li>
             </ol>
+            <h5><a href="https://info.arxiv.org/help/subscribe.html" target="_blank">How to subscribe to Arxiv</a></h5>
         </div>
 
         <style>
@@ -42,6 +43,7 @@
                 width: max(320px, min(800px, calc(100% - 24px)));
                 box-sizing: border-box;
                 font-family: sans-serif;
+                overflow-y: scroll;
             }
             h1 {
                 text-align: center;
@@ -194,12 +196,12 @@
                 }
                 navigator.clipboard.readText().then((clipText) => {
                     parse(clipText);
-                    docuemnt.querySelector('textarea').value = clipText;
+                    docuemnt.querySelector('textarea').textContent = clipText;
                 });
             }
 
             function clearInput() {
-                document.querySelector('textarea').value = '';
+                document.querySelector('textarea').textContent = '';
                 entries = [];
                 filtered_entries = [];
                 curr_entry_id = 0;
